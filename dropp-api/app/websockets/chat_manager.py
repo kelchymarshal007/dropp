@@ -6,7 +6,6 @@ from app.core.config import settings
 
 class ChatManager:
     def __init__(self):
-        # Maps dropp_id to a list of active WebSockets
         self.active_connections: Dict[str, List[WebSocket]] = {}
         self.redis: aioredis.Redis = None
 
@@ -24,18 +23,24 @@ class ChatManager:
                 del self.active_connections[dropp_id]
 
     async def broadcast(self, dropp_id: str, message: dict):
-        # Broadcast to all local connections in this specific container
         if dropp_id in self.active_connections:
             for connection in self.active_connections[dropp_id]:
                 await connection.send_json(message)
 
     async def publish_to_redis(self, dropp_id: str, message: dict):
-        # Publish to Redis so OTHER containers can pick it up
         if self.redis:
             await self.redis.publish(f"chat_{dropp_id}", json.dumps(message))
+            
+    async def inject_agent_action(self, dropp_id: str, body: str, action_prompt: str):
+        """Injects a structured AI prompt (e.g., 'Do you accept the price?')"""
+        msg = {
+            "sender_type": "agent",
+            "body": body,
+            "action_prompt": action_prompt 
+        }
+        await self.publish_to_redis(dropp_id, msg)
 
     async def listen_to_redis(self):
-        # Background task that listens to Redis and broadcasts locally
         self.redis = aioredis.from_url(settings.REDIS_URL, decode_responses=True)
         pubsub = self.redis.pubsub()
         await pubsub.psubscribe("chat_*")

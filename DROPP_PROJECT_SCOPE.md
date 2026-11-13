@@ -264,3 +264,18 @@ The app is a PWA built in Next.js (Flutter later). It has 3 core tabs:
 - **Stage 7:** Reels Engine (S3 Upload, FFmpeg Worker, Feed API).
 - **Stage 8:** Realtime Chat (WebSockets, Messages table, Redis Pub/Sub).
 - **Stage 9:** BIKEM Integration & Ledger (Escrow logic).
+
+## 25. DISPUTE RESOLUTION & AUTO-RELEASE
+
+### 25.1 The 24-Hour Auto-Release Timer
+- Once the Seller marks the item as `shipped` and the carrier confirms `delivered`, the state machine starts a 24-hour timer.
+- The Buyer is notified via push/chat: "Item delivered. Please confirm receipt within 24 hours."
+- If the Buyer does nothing, the Celery worker automatically transitions the state to `completed` and triggers the escrow release. This prevents buyers from holding sellers' money hostage.
+
+### 25.2 The Dispute Flow
+- **Trigger:** Buyer or Seller can open a dispute from `funded`, `shipped`, or `delivered`.
+- **State:** `disputed`. Funds are **FROZEN**.
+- **Evidence Phase (72h):** Both parties are prompted to upload video/photo evidence to the chat/evidence locker.
+- **Admin Resolution:**
+  - `refunded`: Buyer gets money back. Seller pays return shipping + Dropp penalty fee.
+  - `completed`: Seller gets money. Buyer's dispute is rejected.

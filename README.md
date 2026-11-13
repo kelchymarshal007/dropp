@@ -24,3 +24,6 @@ Dropp is a full-scale social commerce platform that turns unstructured social me
 ## 5. The Escrow State Machine
 `draft` -> `sent` -> `viewed` -> `negotiating` -> `agreed` -> `awaiting_payment` -> `funded` -> `shipped` -> `delivered` -> `completed`. 
 Funds are only released when the state reaches `completed`.
+
+## 6. Dispute Resolution & Auto-Release
+Dropp protects both parties with a 24-hour auto-release timer and a strict 72-hour dispute window. All evidence is uploaded via video/photo to the trade chat. If a dispute is opened, funds are frozen until an admin reviews the evidence and resolves the case (Refund Buyer or Release to Seller with penalties).
