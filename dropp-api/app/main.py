@@ -8,7 +8,7 @@ from app.models.ledger import LedgerEntry
 from app.models.post import Post
 from app.models.message import Message
 from app.models.scout import WantedRequest
-from app.api import dropps, auth, chat
+from app.api import dropps, auth, chat, payments
 from app.websockets.chat_manager import chat_manager
 
 app = FastAPI(title="Dropp Core API", version="1.0.0")
@@ -33,6 +33,7 @@ async def startup():
 app.include_router(auth.router)
 app.include_router(dropps.router)
 app.include_router(chat.router)
+app.include_router(payments.router)
 
 @app.get("/health")
 def health_check():
