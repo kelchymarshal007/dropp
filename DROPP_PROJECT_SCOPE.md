@@ -279,3 +279,19 @@ The app is a PWA built in Next.js (Flutter later). It has 3 core tabs:
 - **Admin Resolution:**
   - `refunded`: Buyer gets money back. Seller pays return shipping + Dropp penalty fee.
   - `completed`: Seller gets money. Buyer's dispute is rejected.
+
+## 26. DROPP REELS: MEDIA PIPELINE & SOCIAL GRAPH
+
+### 26.1 The Media Pipeline (Seamless Playback)
+To ensure Dropp Reels loads instantly like TikTok/Instagram, we do not serve raw MP4 files. We use a multi-step pipeline:
+1.  **Ingest & Compress:** The `dropp-media` worker receives the file and uses FFmpeg to compress it to a baseline (1080x1920, H.264, ~5Mbps).
+2.  **ABR Ladder Generation:** We transcode the baseline into multiple renditions (1080p, 720p, 480p).
+3.  **HLS Packaging:** We chunk the videos into 2-second segments and package them as HLS (HTTP Live Streaming) playlists (.m3u8).
+4.  **CDN Delivery:** The `.m3u8` playlists and chunks are stored on Cloudflare R2/S3 and served via CDN. The player uses Adaptive Bitrate Streaming (ABR) to switch quality based on the user's network speed.
+
+### 26.2 The Social Graph
+Reels are not just videos; they are social objects. We track:
+- **Likes:** `post_likes` table (unique user-post pair).
+- **Comments:** `post_comments` table (supports threaded replies via `parent_id`).
+- **Drops:** `dropp_count` (how many times a Dropp Card was created from this Reel).
+- **Shares:** `share_count` (native share sheet usage).

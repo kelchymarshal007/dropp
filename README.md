@@ -27,3 +27,6 @@ Funds are only released when the state reaches `completed`.
 
 ## 6. Dispute Resolution & Auto-Release
 Dropp protects both parties with a 24-hour auto-release timer and a strict 72-hour dispute window. All evidence is uploaded via video/photo to the trade chat. If a dispute is opened, funds are frozen until an admin reviews the evidence and resolves the case (Refund Buyer or Release to Seller with penalties).
+
+## 7. Dropp Reels Engine
+Reels are powered by an HLS (HTTP Live Streaming) pipeline. The `dropp-media` worker uses FFmpeg to transcode uploads into an ABR (Adaptive Bitrate) ladder, chunked into 2-second HLS segments. This ensures seamless, buffer-free playback globally via CDN, even on 3G networks. The Reels backend includes full social features: Likes, Comments (threaded), Drops, and Shares.
