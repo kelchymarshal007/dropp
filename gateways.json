@@ -1,0 +1,12 @@
+{
+  "gateways": [
+    {
+      "provider": "paystack",
+      "class": "RealPaystackGateway",
+      "module": "app.gateways.plugins.real_paystack_gateway",
+      "zone": "WEST_AFRICA",
+      "priority": 1,
+      "enabled": true
+    }
+  ]
+}
