@@ -6,6 +6,11 @@ services:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dropp -d dropp_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   redis:
     image: redis:7-alpine
@@ -22,8 +27,10 @@ services:
       - ./dropp-api:/app
       - ./gateways.json:/app/gateways.json
     depends_on:
-      - db
-      - redis
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
 
   worker:
     build:
@@ -33,7 +40,8 @@ services:
     volumes:
       - ./dropp-worker:/app
     depends_on:
-      - redis
+      redis:
+        condition: service_started
 
   media-worker:
     build:
@@ -44,7 +52,8 @@ services:
       - ./dropp-worker:/app
       - ./media_temp:/tmp/media
     depends_on:
-      - redis
+      redis:
+        condition: service_started
 
   web:
     build:

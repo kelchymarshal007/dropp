@@ -7,8 +7,7 @@ from app.models.ledger import LedgerEntry
 from app.models.post import Post
 from app.models.message import Message
 from app.models.scout import WantedRequest
-from app.domain.state_machine import validate_transition
-from app.api import dropps
+from app.api import dropps, auth
 
 app = FastAPI(title="Dropp Core API", version="1.0.0")
 
@@ -24,8 +23,9 @@ app.add_middleware(
 async def startup():
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
-    print("SUCCESS: Database connected and full-scale tables created.")
+    print("SUCCESS: Auth tables initialized.")
 
+app.include_router(auth.router)
 app.include_router(dropps.router)
 
 @app.get("/health")
