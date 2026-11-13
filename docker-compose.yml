@@ -29,8 +29,20 @@ services:
     build:
       context: ./dropp-worker
     env_file: .env
+    command: celery -A tasks worker --loglevel=info
     volumes:
       - ./dropp-worker:/app
+    depends_on:
+      - redis
+
+  media-worker:
+    build:
+      context: ./dropp-worker
+    env_file: .env
+    command: celery -A tasks worker --loglevel=info -Q media
+    volumes:
+      - ./dropp-worker:/app
+      - ./media_temp:/tmp/media
     depends_on:
       - redis
 
