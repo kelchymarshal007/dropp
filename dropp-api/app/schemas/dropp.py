@@ -1,6 +1,7 @@
 from pydantic import BaseModel, Field
 from typing import Optional
 from uuid import UUID
+from datetime import datetime
 
 class DroppCreate(BaseModel):
     source_url: str
@@ -25,6 +26,9 @@ class DroppResponse(BaseModel):
     buyer_signature: Optional[str]
     seller_signature: Optional[str]
     checkout_token: Optional[str]
+    shipped_at: Optional[datetime]
+    delivered_at: Optional[datetime]
+    auto_release_at: Optional[datetime]
     
     class Config:
         from_attributes = True
