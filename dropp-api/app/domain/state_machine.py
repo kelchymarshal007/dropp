@@ -1,11 +1,9 @@
 STATES = {
     "draft": {"sent", "cancelled"},
-    "sent": {"viewed", "negotiating", "declined", "expired", "cancelled"},  # <-- Updated
+    "sent": {"viewed", "negotiating", "declined", "expired", "cancelled"},
     "viewed": {"negotiating", "declined", "expired", "cancelled"},
-    "negotiating": {"buyer_accepted", "seller_accepted", "declined", "expired", "cancelled"},
-    "buyer_accepted": {"seller_accepted", "expired", "cancelled"},
-    "seller_accepted": {"awaiting_payment", "expired", "cancelled"},
-    "awaiting_payment": {"funded", "expired"},
+    "negotiating": {"awaiting_payment", "declined", "expired", "cancelled"},  # <-- FIXED
+    "awaiting_payment": {"funded", "expired", "cancelled"},
     "funded": {"shipped", "disputed", "refunded"},
     "shipped": {"delivered", "disputed"},
     "delivered": {"completed", "disputed"},

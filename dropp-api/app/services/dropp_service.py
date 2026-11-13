@@ -42,7 +42,6 @@ async def seller_respond(db: AsyncSession, dropp: Dropp, seller_id: str, availab
     if action == "decline":
         return await transition_state(db, dropp, "declined")
     
-    # THE AI NOTARY INJECTION
     await chat_manager.inject_agent_action(
         dropp_id=dropp.id,
         body=f"Seller confirmed the item is [{availability}]. The chat is now unlocked. You may negotiate the final price.",
@@ -52,28 +51,41 @@ async def seller_respond(db: AsyncSession, dropp: Dropp, seller_id: str, availab
     return await transition_state(db, dropp, "negotiating")
 
 async def sign_deal(db: AsyncSession, dropp: Dropp, user_id: str, final_minor: int, dispatch_mode: str):
-    # (Keep this logic as is, just removing the payment portal drift)
+    # 1. SECURITY: Verify user is buyer or seller
+    is_buyer = str(user_id) == str(dropp.buyer_id)
+    is_seller = str(user_id) == str(dropp.seller_id)
+    
+    if not is_buyer and not is_seller:
+        raise ValueError("You are not a participant in this trade")
+    
+    # 2. Only allow signing in 'negotiating' state
+    if dropp.status != "negotiating":
+        raise ValueError(f"Cannot sign in state: {dropp.status}")
+    
+    # 3. Set terms
     dropp.final_minor = final_minor
     dropp.dispatch_mode = dispatch_mode
     
+    # 4. Generate signature hash
     terms = f"{dropp.id}|{final_minor}|{dispatch_mode}|{user_id}"
     sig = hashlib.sha256(terms.encode()).hexdigest()
     
-    if user_id == dropp.buyer_id:
+    # 5. Record the signature
+    if is_buyer:
         dropp.buyer_signature = sig
         await chat_manager.inject_agent_action(dropp.id, "[AI] Buyer has signed the agreement.", "none")
-    elif user_id == dropp.seller_id:
+    if is_seller:
         dropp.seller_signature = sig
         await chat_manager.inject_agent_action(dropp.id, "[AI] Seller has signed the agreement.", "none")
         
     await db.commit()
     await db.refresh(dropp)
     
+    # 6. If both have signed, lock the deal
     if dropp.buyer_signature and dropp.seller_signature:
         dropp.checkout_token = generate_short_code(16)
         await db.commit()
         
-        # Inject the final AI message
         await chat_manager.inject_agent_action(
             dropp.id, 
             f"[AI] Agreement locked at {final_minor / 100} {dropp.currency}. Buyer, the secure payment portal is ready.",

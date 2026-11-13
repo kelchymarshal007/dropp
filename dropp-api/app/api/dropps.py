@@ -28,7 +28,10 @@ async def seller_respond(dropp_code: str, payload: SellerResponse, db: AsyncSess
     dropp = result.scalar_one_or_none()
     if not dropp:
         raise HTTPException(status_code=404, detail="Dropp not found")
-    return await dropp_service.seller_respond(db, dropp, str(current_user.id), payload.availability_type, payload.action)
+    try:
+        return await dropp_service.seller_respond(db, dropp, str(current_user.id), payload.availability_type, payload.action)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
 @router.post("/{dropp_code}/sign", response_model=DroppResponse)
 async def sign_deal(dropp_code: str, payload: SignDeal, db: AsyncSession = Depends(get_db), current_user: User = Depends(get_current_user)):
@@ -36,4 +39,7 @@ async def sign_deal(dropp_code: str, payload: SignDeal, db: AsyncSession = Depen
     dropp = result.scalar_one_or_none()
     if not dropp:
         raise HTTPException(status_code=404, detail="Dropp not found")
-    return await dropp_service.sign_deal(db, dropp, str(current_user.id), payload.final_minor, payload.dispatch_mode)
+    try:
+        return await dropp_service.sign_deal(db, dropp, str(current_user.id), payload.final_minor, payload.dispatch_mode)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
