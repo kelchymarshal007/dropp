@@ -1,20 +1,21 @@
 from fastapi import FastAPI
 from app.core.database import engine, Base
-# Import all models so SQLAlchemy creates the tables
 from app.models.user import User
 from app.models.dropp import Dropp
 from app.models.ledger import LedgerEntry
 from app.models.post import Post
 from app.domain.state_machine import validate_transition
+from app.api import dropps
 
 app = FastAPI(title="Dropp Core API", version="1.0.0")
 
 @app.on_event("startup")
 async def startup():
     async with engine.begin() as conn:
-        # Create tables if they don't exist
         await conn.run_sync(Base.metadata.create_all)
     print("SUCCESS: Database connected and all tables created.")
+
+app.include_router(dropps.router)
 
 @app.get("/health")
 def health_check():
