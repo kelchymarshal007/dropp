@@ -30,3 +30,9 @@ Dropp protects both parties with a 24-hour auto-release timer and a strict 72-ho
 
 ## 7. Dropp Reels Engine
 Reels are powered by an HLS (HTTP Live Streaming) pipeline. The `dropp-media` worker uses FFmpeg to transcode uploads into an ABR (Adaptive Bitrate) ladder, chunked into 2-second HLS segments. This ensures seamless, buffer-free playback globally via CDN, even on 3G networks. The Reels backend includes full social features: Likes, Comments (threaded), Drops, and Shares.
+
+## 8. Dropp Scout (Pro Lead Gen)
+Dropp Scout is a premium SaaS feature for Pro Buyers. Users submit a "Wanted Request" (e.g., "Nike Air Jordan 1, Size 10, $300"). The Scout Engine uses external search APIs to find matching items on social media and public web indexes, scoring sellers by reputation and price. The buyer can then instantly send Dropp Bids to the top 5 sellers.
+
+## 9. The Notification Engine
+A centralized, multi-channel notification system (In-App via WebSockets, Email, SMS, and Push) powered by Celery workers. It ensures users are instantly alerted when a Scout match is found, funds are locked, an item is shipped, or a dispute is opened.

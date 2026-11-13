@@ -295,3 +295,27 @@ Reels are not just videos; they are social objects. We track:
 - **Comments:** `post_comments` table (supports threaded replies via `parent_id`).
 - **Drops:** `dropp_count` (how many times a Dropp Card was created from this Reel).
 - **Shares:** `share_count` (native share sheet usage).
+
+## 27. DROPP SCOUT: EXTERNAL LEAD GENERATION (PRO FEATURE)
+
+### 27.1 Overview
+Dropp Scout is an AI-powered sourcing engine for Pro Buyers. It searches the external web and social media platforms for items matching the buyer's request, scores the sellers based on reputation and price, and generates Dropp Bids.
+
+### 27.2 The Scout Pipeline
+1. **Input:** Buyer creates a `WantedRequest` (Item, Target Price, Source Location, Buyer Location).
+2. **Discovery:** The `ScoutWorker` calls a Search API (e.g., SerpApi) to find public posts matching the keywords.
+3. **Scoring:** Extracts seller handle, post URL, and engagement metrics (likes/comments). If the seller has high engagement and the price matches, the score is high.
+4. **Output:** Returns a list of Top 5 Matches to the Buyer.
+5. **Action:** Buyer can manually send a Dropp Bid to each match, or use the "Auto-Bid" feature (Pro only) to send links to the top 5.
+
+## 28. THE NOTIFICATION SYSTEM
+
+### 28.1 Overview
+A centralized service that fires notifications across In-App (WebSocket), Email, SMS, and Push (FCM).
+
+### 28.2 Data Model
+- `notifications` table: `id`, `user_id`, `type` (scout_match, escrow_update, dispute), `title`, `body`, `is_read`, `created_at`.
+
+### 28.3 Channels
+- **WebSocket:** Instantly pushes to the UI if the user is online.
+- **Celery Worker:** Queues emails (SendGrid) and SMS (Termii) for asynchronous delivery.
