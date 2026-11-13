@@ -209,3 +209,27 @@ We build in 7 distinct stages. No stage is marked complete until Docker builds, 
 - **Stage 6: BIKEM Integration** - Gateway loading, webhook handlers, real payment flow.
 - **Stage 7: Jobs & Admin** - Celery timers for expiration, Admin dispute UI.
 
+
+---
+
+## 23. AMENDMENT: DUAL-TRACK ARCHITECTURE (PUBLIC LINK + FULL APP)
+
+We are building both a frictionless public web link and a full social commerce app (PWA first, Flutter later).
+
+### Track 1: The Public Web Link (Frictionless Onboarding)
+- Buyer lands on `/d/[code]` without an account.
+- Views the offer, clicks "Accept & Pay".
+- Enters phone number (OTP). Once verified, the Dropp is created and sent to the seller's DM.
+- The buyer is prompted: "Download the Dropp App to track your order and chat with the seller."
+
+### Track 2: The Full App (The 3 Pillars)
+The app is a PWA built in Next.js (Flutter later). It has 3 core tabs:
+1. **Reels Tab (Discovery):** Vertical video feed of items. Tap to create a Dropp or view details.
+2. **TradeChat Tab (Negotiation & Escrow):** 3-way chat (Buyer, Seller, AI Agent). System messages are injected by the backend State Machine to confirm funds are locked, shipped, etc.
+3. **Card Tab (Payments & Dashboard):** Shows Escrow Balance (Pending), Available Balance, and DroppScore. Powered entirely by the append-only `ledger_entries` table.
+
+### Frontend Route Structure (Next.js App Router)
+- `(public)/d/[code]` - The public escrow link.
+- `(app)/reels` - The vertical video feed.
+- `(app)/chat/[id]` - The TradeChat interface.
+- `(app)/card` - The Wallet/Dashboard.
