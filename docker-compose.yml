@@ -32,28 +32,50 @@ services:
       redis:
         condition: service_started
 
+  # Main Worker (Timers)
   worker:
     build:
       context: ./dropp-worker
     env_file: .env
-    command: celery -A tasks worker --loglevel=info
+    command: celery -A app.tasks.timers worker --loglevel=info -Q celery
     volumes:
       - ./dropp-worker:/app
     depends_on:
-      redis:
-        condition: service_started
+      - redis
 
+  # Dedicated Email Worker
+  worker-email:
+    build:
+      context: ./dropp-worker
+    env_file: .env
+    command: celery -A app.tasks.notifications worker --loglevel=info -Q notifications_email
+    volumes:
+      - ./dropp-worker:/app
+    depends_on:
+      - redis
+
+  # Dedicated SMS Worker
+  worker-sms:
+    build:
+      context: ./dropp-worker
+    env_file: .env
+    command: celery -A app.tasks.notifications worker --loglevel=info -Q notifications_sms
+    volumes:
+      - ./dropp-worker:/app
+    depends_on:
+      - redis
+
+  # Media Worker (FFmpeg)
   media-worker:
     build:
       context: ./dropp-worker
     env_file: .env
-    command: celery -A tasks worker --loglevel=info -Q media
+    command: celery -A app.tasks.media worker --loglevel=info -Q media
     volumes:
       - ./dropp-worker:/app
       - ./media_temp:/tmp/media
     depends_on:
-      redis:
-        condition: service_started
+      - redis
 
   web:
     build:
