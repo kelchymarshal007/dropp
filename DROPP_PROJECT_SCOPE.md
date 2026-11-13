@@ -233,3 +233,34 @@ The app is a PWA built in Next.js (Flutter later). It has 3 core tabs:
 - `(app)/reels` - The vertical video feed.
 - `(app)/chat/[id]` - The TradeChat interface.
 - `(app)/card` - The Wallet/Dashboard.
+
+---
+
+## 24. FULL-SCALE BACKEND ARCHITECTURE & TECH STACK
+
+### 24.1 The Microservices
+1. **dropp-api (FastAPI):** REST, Auth, State Machine, WebSockets.
+2. **dropp-worker (Celery):** State timers, notifications, dispatch webhooks.
+3. **dropp-media (Celery Worker):** FFmpeg video compression for Reels.
+4. **dropp-web (Next.js PWA):** 3 Pillars (Reels, Chat, Card).
+5. **dropp-db (PostgreSQL 16):** Core relational data + Append-only Ledger.
+6. **dropp-redis (Redis 7):** Pub/Sub for Chat, Cache, Task Broker.
+
+### 24.2 System Flows
+- **Auth:** Phone OTP (Termii) -> Backend verifies -> Issues JWT.
+- **Reels:** Upload -> Celery/FFmpeg compress -> S3/R2 -> CDN -> Next.js Video Feed.
+- **Chat:** WebSocket -> Postgres (save) -> Redis Pub/Sub (broadcast to Buyer/Seller/AI).
+- **Payments:** BIKEM Engine Webhook -> Verify HMAC -> State Machine -> Ledger.
+- **Dispatch:** Courier API (DHL/GIG) -> Waybill generation -> Delivery Webhook -> Start Inspection Timer.
+
+### 24.3 Scalability Strategy
+- **Database:** PgBouncer for connection pooling, Read Replicas for feed/chat.
+- **Redis:** Redis Cluster for WebSocket scaling.
+- **Storage:** Cloudflare R2 for zero-egress video storage.
+- **Edge:** Cloudflare CDN for global video caching.
+
+### 24.4 Next Build Stages
+- **Stage 6:** Auth & User Management (OTP, JWT, User table).
+- **Stage 7:** Reels Engine (S3 Upload, FFmpeg Worker, Feed API).
+- **Stage 8:** Realtime Chat (WebSockets, Messages table, Redis Pub/Sub).
+- **Stage 9:** BIKEM Integration & Ledger (Escrow logic).
