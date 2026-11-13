@@ -3,7 +3,7 @@ from typing import Optional
 from uuid import UUID
 
 class DroppCreate(BaseModel):
-    buyer_id: str = Field(..., description="The ID of the buyer creating the Dropp")
+    # buyer_id is REMOVED. It comes from the JWT token.
     source_url: str = Field(..., description="The Instagram/TikTok link")
     source_platform: str = Field(..., description="instagram, tiktok, whatsapp")
     title: str = Field(..., description="Name of the item")
