@@ -427,3 +427,22 @@ Dropp is strictly a commerce platform, not a social network.
 - The root URL (`/`) is an animated Splash screen lasting 1.5 seconds.
 - It immediately routes to `/reels` (Public, no auth required).
 - If a user clicks "Drop this" or "Like", a modal prompts them to log in (Lazy Auth).
+
+## 34. TIKTOK-STYLE PROFILE & VIDEO PROCESSING PIPELINE
+
+### 34.1 The Creator Profile UI
+- **Layout:** Mimics TikTok. Header with Avatar, Name, Handle, and Analytics (Trades, Followers, Views).
+- **Grid:** 3-column masonry grid showing uploaded Reels. Drafts are shown with a lock/draft icon.
+- **FAB (Floating Action Button):** A "Liquid Glass" plus button hovering above the grid to trigger the video upload/editor flow.
+
+### 34.2 Client-Side Video Editor (Phase 2)
+- Built using `ffmpeg.wasm` (FFmpeg compiled to WebAssembly) so users can trim, crop, add text, and add music directly in the browser without uploading the raw file first.
+- Limits: Max 15 seconds, max 10MB. 
+
+### 34.3 Server-Side Processing Pipeline (The Magic)
+To ensure the server never slows down, we use an asynchronous pipeline:
+1. **Raw Upload:** Browser uploads the 15s video to an S3/R2 temporary bucket.
+2. **Queue:** The API drops a message into Redis (`process_video` task).
+3. **Media Worker:** A dedicated Celery container (running FFmpeg) picks up the task, transcodes the video to 720p/1080p H.264, and generates HLS chunks.
+4. **CDN Delivery:** The processed chunks are uploaded to Cloudflare R2 and served via CDN. The database is updated with the new `.m3u8` URL.
+5. **Scalability:** Because processing happens in the background, the API can accept 10,000 uploads per second without breaking a sweat.
