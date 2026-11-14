@@ -36,3 +36,6 @@ Dropp Scout is a premium SaaS feature for Pro Buyers. Users submit a "Wanted Req
 
 ## 9. The Notification Engine
 A centralized, multi-channel notification system (In-App via WebSockets, Email, SMS, and Push) powered by Celery workers. It ensures users are instantly alerted when a Scout match is found, funds are locked, an item is shipped, or a dispute is opened.
+
+## 10. The Reels Engine & Acquisition Loop
+Dropp uses a TikTok-style acquisition loop. The app opens directly into a public, animated Splash screen that routes to `/reels`. Viewers can watch videos instantly without signing up. Authentication is "lazy"—triggered only when a user tries to interact (like, comment, or create a Dropp bid). The feed uses a preloading client strategy and HLS adaptive bitrate streaming to ensure zero-buffer playback, powered by a caching layer for algorithmically ranked content.
