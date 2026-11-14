@@ -319,3 +319,40 @@ A centralized service that fires notifications across In-App (WebSocket), Email,
 ### 28.3 Channels
 - **WebSocket:** Instantly pushes to the UI if the user is online.
 - **Celery Worker:** Queues emails (SendGrid) and SMS (Termii) for asynchronous delivery.
+
+## 29. FRONTEND ROUTE MAP & UX RULES
+
+We are building a mobile-first, monochrome Progressive Web App (PWA) in Next.js. Every primary action must be achievable within **3 taps (The 3-Click Rule)**. 
+
+### 29.1 The Auth Phase (Current Build Focus)
+This is the scope for Phase 1. We do not build the rest of the app until this is perfect.
+
+| Route | Type | Purpose |
+| :--- | :--- | :--- |
+| `/auth/welcome` | Page | 3-slide onboarding splash with "Get Started" CTA |
+| `/auth/login` | Page | Root login (Tabs: Email / Phone) |
+| `/auth/signup` | Page | Root signup (Tabs: Email / Phone / Google / Apple) |
+| `/auth/verify-otp` | Page | 6-digit OTP verification (auto-submits) |
+| `/auth/role` | Page | Post-signup: Choose "I'm buying" or "I'm selling" |
+| `/auth/forgot-password` | Page | Enter email to receive reset link |
+| `/auth/reset-password` | Page | Set new password via token |
+| `/auth/verify-email` | Page | Landing page for email verification link |
+| `/auth/kyc` | Page | Seller KYC (Gate to first payout) - Phase 2 |
+
+### 29.2 The Core App (Future Phases)
+| Route | Sub-Routes / Modals | Purpose |
+| :--- | :--- | :--- |
+| `/reels` | `/upload`, `+comments modal`, `+share modal` | TikTok-style discovery feed |
+| `/chat` | `/chat/[id]`, `+availability modal`, `+sign modal`, `+dispute modal` | 3-way TradeChat and Escrow state |
+| `/create` | `/preview`, `/manual`, `/offer`, `/share` | Link parser to create a Dropp Card |
+| `/d/[code]` | `/expired`, `/claimed`, `+login modal`, `+accept modal` | Public Dropp Card (Buyer-facing) |
+| `/pay/[token]` | `/method`, `/card`, `/transfer`, `/success` | Secret Checkout Portal |
+| `/card` | `/transactions`, `/escrow`, `/payouts`, `/payouts/new` | Wallet, Balance, and Payouts |
+| `/scout` | `/new`, `/requests`, `/requests/[id]/matches` | Pro Buyer Sourcing Engine |
+| `/profile` | `/edit`, `/settings`, `/notifications` | User Profile and Settings |
+
+### 29.3 Shared UI Rules
+1. **Mobile-First:** All pages built for `375px` width, centered on desktop with `max-w-md`.
+2. **Icons:** FontAwesome Solid only. No emojis.
+3. **Theme:** Pure black background (`#000000`), white text, Amazon-style Orange (`#FF9900`) for primary CTAs.
+4. **Auth Gating:** If a user opens `/reels`, `/chat`, or `/card` without a JWT in `localStorage`, they are instantly redirected to `/auth/login`.
