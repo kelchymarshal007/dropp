@@ -384,3 +384,28 @@ We are pivoting the entry point of the app to maximize user acquisition (TikTok 
 - **Load Balancers:** For routing API requests.
 - **Database Indexing:** Heavy indexing on `created_at`, `like_count`, and `view_count`.
 - **Redis:** For feed caching, session management, and rate limiting.
+
+## 31. USER & CREATOR OPERATIONS (The Profile Tab)
+
+The "Profile" tab is not just a static page; it is a full Creator Dashboard where users manage their entire Dropp ecosystem.
+
+### 31.1 Creator Content (My Reels)
+- `/profile/reels`: Grid view of uploaded videos.
+- `/profile/reels/[id]/edit`: Edit caption, price, or delete.
+- `/profile/reels/[id]/analytics`: Views, likes, comments, and Dropp conversions.
+
+### 31.2 Trade Management
+- `/profile/trades`: Active and past escrow deals.
+- `/profile/disputes`: Open disputes and evidence submission.
+- `/profile/scout`: Manage Wanted Requests (Pro).
+
+### 31.3 Financial Operations
+- `/profile/wallet`: Balance (Available vs Pending), transaction history.
+- `/profile/payouts`: Withdrawal requests.
+- `/profile/banks`: Manage linked bank accounts.
+
+### 31.4 Account Settings
+- `/profile/edit`: Update avatar, name, handle.
+- `/profile/kyc`: Identity verification.
+- `/profile/subscription`: Manage Pro tiers.
+- `/profile/settings`: Notifications, security, and logout.
