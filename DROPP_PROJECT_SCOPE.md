@@ -409,3 +409,21 @@ The "Profile" tab is not just a static page; it is a full Creator Dashboard wher
 - `/profile/kyc`: Identity verification.
 - `/profile/subscription`: Manage Pro tiers.
 - `/profile/settings`: Notifications, security, and logout.
+
+## 32. COMMERCE-ONLY CONTENT & MODERATION
+
+Dropp is strictly a commerce platform, not a social network. 
+### 32.1 Content Rules
+- **Products Only:** Users can only post videos showcasing items for sale (e.g., electronics, fashion, services). Personal vlogs, memes, or unrelated content are prohibited.
+- **No NSFW:** Explicit content of any kind will result in an immediate ban.
+
+### 32.2 Moderation Pipeline
+1. **Pre-Upload Checkbox:** Users must agree to the commerce-only policy before the upload starts.
+2. **AI Vision Moderation (Backend):** The `media-worker` uses a Vision API to detect NSFW. If flagged, the video is auto-deleted, and the user receives a warning.
+3. **Product Verification:** AI checks if the video contains a product. If borderline, it goes to the Admin Moderation Queue.
+4. **Admin Moderation:** Admins can approve or reject flagged videos before they go live on the Reels feed.
+
+## 33. THE SPLASH & LAZY AUTH FLOW
+- The root URL (`/`) is an animated Splash screen lasting 1.5 seconds.
+- It immediately routes to `/reels` (Public, no auth required).
+- If a user clicks "Drop this" or "Like", a modal prompts them to log in (Lazy Auth).
