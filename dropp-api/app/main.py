@@ -10,7 +10,7 @@ from app.models.post_social import PostLike, PostComment
 from app.models.message import Message
 from app.models.scout import WantedRequest
 from app.models.notification import Notification
-from app.api import dropps, auth, chat, payments, posts, feed, fulfillment, scout, notifications
+from app.api import dropps, auth, chat, payments, posts, feed, fulfillment, scout, notifications, admin
 from app.websockets.chat_manager import chat_manager
 
 app = FastAPI(title="Dropp Core API", version="1.0.0")
@@ -38,6 +38,7 @@ app.include_router(posts.router)
 app.include_router(feed.router)
 app.include_router(fulfillment.router)
 app.include_router(scout.router)
+app.include_router(admin.router)
 app.include_router(notifications.router)
 
 @app.get("/health")
