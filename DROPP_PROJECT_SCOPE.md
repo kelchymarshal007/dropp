@@ -356,3 +356,31 @@ This is the scope for Phase 1. We do not build the rest of the app until this is
 2. **Icons:** FontAwesome Solid only. No emojis.
 3. **Theme:** Pure black background (`#000000`), white text, Amazon-style Orange (`#FF9900`) for primary CTAs.
 4. **Auth Gating:** If a user opens `/reels`, `/chat`, or `/card` without a JWT in `localStorage`, they are instantly redirected to `/auth/login`.
+
+## 30. TIKTOK-STYLE REELS ENGINE & LAZY AUTHENTICATION
+
+### 30.1 The Frictionless Entry (Splash & Public Feed)
+We are pivoting the entry point of the app to maximize user acquisition (TikTok model).
+- **The Splash:** The root URL (`/`) displays an animated Dropp logo for 1.5 seconds, then immediately redirects to `/reels`.
+- **Public Reels:** The `/reels` feed is 100% public. No JWT is required to view videos.
+- **Lazy Authentication (Soft Gate):** Authentication is only triggered when the user attempts a protected action (Like, Comment, Share, or "Drop it"). This ensures immediate content delivery.
+
+### 30.2 The Video Pipeline (HLS & ABR)
+- **Ingest:** FFmpeg compresses uploads to 720p H.264.
+- **ABR Ladder:** Generates multiple resolutions (1080p, 720p, 480p).
+- **HLS Packaging:** Chunks video into 2-second segments (.m3u8 playlists) for adaptive streaming.
+- **Delivery:** Cloudflare R2 + CDN for edge caching and instant playback.
+
+### 30.3 Client Preloader
+- **IntersectionObserver:** Only the video in the viewport plays.
+- **Preload Window:** Preloads the next 2-3 videos in the background. Unmounts videos scrolled out of view to save memory.
+
+### 30.4 The Recommendation Engine (MVP)
+- **Data Collection:** Logs watch time, completion rate, likes, comments, and shares.
+- **Ranking Formula (MVP):** Score = (Watch Time * 0.5) + (Likes * 0.2) + (Comments * 0.3).
+- **Caching:** Pre-computed feeds cached in Redis for instant load.
+
+### 30.5 Scalability
+- **Load Balancers:** For routing API requests.
+- **Database Indexing:** Heavy indexing on `created_at`, `like_count`, and `view_count`.
+- **Redis:** For feed caching, session management, and rate limiting.
