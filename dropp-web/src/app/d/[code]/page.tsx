@@ -22,7 +22,7 @@ export default function DroppCardPage() {
     if (!code) return;
     
     // Fetch from our FastAPI backend (Port 8001)
-    fetch(`http://localhost:8001/v1/dropps/${code}`)
+    fetch(`/api/v1/dropps/${code}`)
       .then(res => {
         if (!res.ok) throw new Error('Dropp not found')
         return res.json()

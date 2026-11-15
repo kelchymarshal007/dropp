@@ -1,16 +1,19 @@
-import Link from 'next/link'
-
-export default function Home() {
+export default function SplashPage() {
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center p-6 text-center">
-      <h1 className="text-5xl font-extrabold mb-4 text-white">Dropp</h1>
-      <p className="text-xl text-slate-400 mb-8">Don't DM and pray. Get it protected.</p>
-      <Link 
-        href="/d/PuJPaBoK" 
-        className="px-6 py-3 bg-blue-600 text-white rounded-full font-semibold hover:bg-blue-500 transition"
-      >
-        Test a Dropp Card
-      </Link>
+    <main className="flex min-h-screen items-center justify-center bg-black">
+      {/* 
+        This meta tag forces the browser to redirect.
+        It works 100% of the time, even if React fails to load.
+      */}
+      <meta httpEquiv="refresh" content="1.5;url=/reels" />
+      
+      <h1 className="text-6xl font-extrabold tracking-tighter text-white flex space-x-1">
+        <span className="animate-wiggle" style={{ animationDelay: '0ms' }}>D</span>
+        <span className="animate-wiggle" style={{ animationDelay: '100ms' }}>r</span>
+        <span className="animate-wiggle" style={{ animationDelay: '200ms' }}>o</span>
+        <span className="animate-wiggle" style={{ animationDelay: '300ms' }}>p</span>
+        <span className="animate-wiggle" style={{ animationDelay: '400ms' }}>p</span>
+      </h1>
     </main>
-  )
+  );
 }

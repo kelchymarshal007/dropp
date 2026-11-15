@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, Boolean
+from sqlalchemy import Column, String, Boolean, Integer
 from app.models.base import BaseModel
 
 class User(BaseModel):
@@ -21,3 +21,5 @@ class User(BaseModel):
     # Subscription tiers: free, pro_buyer, pro_seller
     tier = Column(String, default="free", nullable=False)
     tier_expires_at = Column(String, nullable=True)
+    follower_count = Column(Integer, default=0, nullable=False)
+    following_count = Column(Integer, default=0, nullable=False)

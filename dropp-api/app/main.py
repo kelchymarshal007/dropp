@@ -7,13 +7,14 @@ from app.models.dropp import Dropp
 from app.models.ledger import LedgerEntry
 from app.models.post import Post
 from app.models.post_social import PostLike, PostComment
+from app.models.bookmark import Bookmark
 from app.models.message import Message
 from app.models.scout import WantedRequest
 from app.models.notification import Notification
-from app.api import dropps, auth, chat, payments, posts, feed, fulfillment, scout, notifications, admin
+from app.api import dropps, auth, chat, payments, posts, feed, fulfillment, scout, notifications, admin, users
 from app.websockets.chat_manager import chat_manager
 
-app = FastAPI(title="Dropp Core API", version="1.0.0")
+app = FastAPI(title="Dropp Core API", version="1.0.0", redirect_slashes=False)
 
 app.add_middleware(
     CORSMiddleware,
@@ -39,7 +40,13 @@ app.include_router(feed.router)
 app.include_router(fulfillment.router)
 app.include_router(scout.router)
 app.include_router(admin.router)
+app.include_router(users.router)
 app.include_router(notifications.router)
+
+from fastapi.staticfiles import StaticFiles
+import os
+os.makedirs("/tmp/media_raw", exist_ok=True)
+app.mount("/media", StaticFiles(directory="/tmp/media_raw"), name="media")
 
 @app.get("/health")
 def health_check():

@@ -10,8 +10,7 @@ services:
       test: ["CMD-SHELL", "pg_isready -U dropp -d dropp_db"]
       interval: 5s
       timeout: 5s
-      retries: 20
-      start_period: 60s
+      retries: 5
 
   redis:
     image: redis:7-alpine
@@ -22,18 +21,16 @@ services:
     build: 
       context: ./dropp-api
     env_file: .env
-    ports:
-      - "8001:8000"
     volumes:
       - ./dropp-api:/app
       - ./gateways.json:/app/gateways.json
+      - ./media_raw:/tmp/media_raw
     depends_on:
       db:
         condition: service_healthy
       redis:
         condition: service_started
 
-  # Main Worker (Timers)
   worker:
     build:
       context: ./dropp-worker
@@ -44,7 +41,6 @@ services:
     depends_on:
       - redis
 
-  # Dedicated Email Worker
   worker-email:
     build:
       context: ./dropp-worker
@@ -55,7 +51,6 @@ services:
     depends_on:
       - redis
 
-  # Dedicated SMS Worker
   worker-sms:
     build:
       context: ./dropp-worker
@@ -66,7 +61,6 @@ services:
     depends_on:
       - redis
 
-  # Media Worker (FFmpeg)
   media-worker:
     build:
       context: ./dropp-worker
@@ -74,7 +68,7 @@ services:
     command: celery -A app.tasks.media worker --loglevel=info -Q media
     volumes:
       - ./dropp-worker:/app
-      - ./media_temp:/tmp/media
+      - ./media_raw:/tmp/media_raw
     depends_on:
       - redis
 
@@ -82,13 +76,22 @@ services:
     build:
       context: ./dropp-web
     env_file: .env
-    ports:
-      - "3000:3000"
     volumes:
       - ./dropp-web:/app
       - /app/node_modules
       - /app/.next
+    command: sh -c "npm run build && npm run start"
     depends_on:
+      - api
+
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "8080:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - web
       - api
 
 volumes:

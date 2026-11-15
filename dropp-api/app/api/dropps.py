@@ -10,6 +10,7 @@ from app.api.deps import get_current_user
 
 router = APIRouter(prefix="/v1/dropps", tags=["Dropps"])
 
+@router.post("", response_model=DroppResponse)
 @router.post("/", response_model=DroppResponse)
 async def create_dropp(payload: DroppCreate, db: AsyncSession = Depends(get_db), current_user: User = Depends(get_current_user)):
     return await dropp_service.create_dropp(db, payload, str(current_user.id))
