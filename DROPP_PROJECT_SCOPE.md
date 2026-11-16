@@ -466,3 +466,15 @@ To ensure the server never slows down, we use an asynchronous pipeline:
 - The bottom nav Reels tab always resets scope.
 - Deep linking math-scroll works identically in both modes.
 - Pagination is per-scope (user's feed paginates within that user's content).
+
+## 38. DAY 2 OBJECTIVES: COMPLETE AUTHENTICATION LAYER
+
+### 38.1 Google SSO Integration
+- Backend: Endpoint to verify Google ID tokens via Google's OAuth2 API.
+- Frontend: `@react-oauth/google` integration on Login and Signup pages.
+- Flow: One-tap Google button -> Verify Token -> Issue Access + Refresh Tokens -> Redirect to Reels.
+
+### 38.2 Phone OTP Integration (Termii/Firebase)
+- Backend: Endpoint to trigger SMS OTP via Termii.
+- Frontend: Phone input form -> Send OTP -> 6-digit verification screen -> Issue Tokens.
+- Purpose: Market fit for Africa where phone numbers are more reliable than emails.
