@@ -524,3 +524,31 @@ When you buy a domain (e.g., `dropp.app`) and deploy to a server:
 7. Click **Save**.
 
 *Note: The Client ID inside `dropp-web/src/components/AuthProvider.tsx` remains the same. You only change the allowed domains in the Google Console.*
+
+## 41. PRODUCTION SCALABILITY BLUEPRINT
+
+This document outlines how Dropp will handle millions of concurrent users.
+
+### 41.1 Video Uploads (Direct-to-Cloud)
+- **Problem:** API server crashes under heavy file upload.
+- **Solution:** Presigned URLs. Frontend uploads directly to AWS S3 / Cloudflare R2. API only handles metadata and queues FFmpeg jobs via Celery.
+
+### 41.2 Video Playback (Global CDN)
+- **Problem:** Bandwidth exhaustion and slow load times.
+- **Solution:** Cloudflare CDN serves all media from edge locations closest to the user. API never serves video bytes.
+
+### 41.3 Likes & Comments (Hot Row Avoidance)
+- **Problem:** Database row locks during viral events.
+- **Solution:** Redis in-memory counters. Likes are written to Redis instantly, and a Celery worker flushes the aggregated counts to PostgreSQL every 60 seconds.
+
+### 41.4 Authentication (Rate Limiting)
+- **Problem:** Brute force and DDoS attacks.
+- **Solution:** Cloudflare WAF + Redis-based rate limiting on API endpoints (max 5 req/min per IP for login). CAPTCHA for suspicious activity.
+
+### 41.5 Read Heavy Traffic (Read Replicas)
+- **Problem:** Feed and profile queries slow down the DB.
+- **Solution:** PostgreSQL Read Replicas. Writes go to Primary, Reads go to Replicas.
+
+### 41.6 Background Processing (Celery Queues)
+- **Problem:** Worker bottlenecks.
+- **Solution:** Dedicated queues (media, email, sms, timers) with auto-scaling container groups.
