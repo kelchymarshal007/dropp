@@ -1,53 +1,76 @@
-import random
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
+from datetime import datetime
+
 from app.models.user import User
 from app.core.security import get_password_hash, verify_password
 
-otp_store = {} # In-memory OTP storage (Move to Redis in production)
 
-async def create_email_user(db: AsyncSession, email: str, password: str, is_seller: bool):
-    # Check if exists
-    result = await db.execute(select(User).where(User.email == email))
-    if result.scalar_one_or_none():
-        return None
-    
-    new_user = User(
+async def get_user_by_email(db: AsyncSession, email: str):
+    r = await db.execute(select(User).where(User.email == email))
+    return r.scalar_one_or_none()
+
+
+async def get_user_by_phone(db: AsyncSession, phone: str):
+    r = await db.execute(select(User).where(User.phone_e164 == phone))
+    return r.scalar_one_or_none()
+
+
+async def create_pending_user(
+    db: AsyncSession,
+    email: str,
+    password: str,
+    first_name: str,
+    last_name: str,
+    phone_e164: str,
+    is_seller: bool,
+) -> User:
+    user = User(
         email=email,
         hashed_password=get_password_hash(password),
-        is_seller=is_seller
+        first_name=first_name,
+        last_name=last_name,
+        display_name=f"{first_name} {last_name}".strip(),
+        phone_e164=phone_e164,
+        is_seller=is_seller,
+        email_verified=False,
+        phone_verified=False,
     )
-    db.add(new_user)
+    db.add(user)
     await db.commit()
-    await db.refresh(new_user)
-    return new_user
+    await db.refresh(user)
+    return user
+
+
+async def mark_email_verified(db: AsyncSession, email: str):
+    user = await get_user_by_email(db, email)
+    if not user:
+        return None
+    user.email_verified = True
+    await db.commit()
+    await db.refresh(user)
+    return user
+
+
+async def mark_phone_verified(db: AsyncSession, phone: str):
+    user = await get_user_by_phone(db, phone)
+    if not user:
+        return None
+    user.phone_verified = True
+    await db.commit()
+    await db.refresh(user)
+    return user
+
 
 async def authenticate_email_user(db: AsyncSession, email: str, password: str):
-    result = await db.execute(select(User).where(User.email == email))
-    user = result.scalar_one_or_none()
+    user = await get_user_by_email(db, email)
     if not user or not user.hashed_password:
         return None
     if not verify_password(password, user.hashed_password):
         return None
     return user
 
-def generate_otp(phone: str) -> str:
-    otp = str(random.randint(100000, 999999))
-    otp_store[phone] = otp
-    print(f"--- MOCK SMS TO {phone} ---")
-    print(f"YOUR DROPP OTP IS: {otp}")
-    return otp
 
-async def verify_otp_and_get_user(db: AsyncSession, phone: str, code: str):
-    if otp_store.get(phone) != code:
-        return None
-    del otp_store[phone]
-    
-    result = await db.execute(select(User).where(User.phone_e164 == phone))
-    user = result.scalar_one_or_none()
-    if not user:
-        user = User(phone_e164=phone)
-        db.add(user)
-        await db.commit()
-        await db.refresh(user)
-    return user
+async def touch_last_login(db: AsyncSession, user: User) -> None:
+    user.last_login = datetime.utcnow()
+    await db.commit()

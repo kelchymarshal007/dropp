@@ -1,19 +1,18 @@
 import './globals.css'
 import type { Metadata } from 'next'
 import { BottomNav } from '@/components/BottomNav'
+import { Coiny } from 'next/font/google'
+
+const coiny = Coiny({ weight: '400', subsets: ['latin'], variable: '--font-coiny' })
 
 export const metadata: Metadata = {
   title: 'Dropp - Chat. Pay. Trust.',
   description: 'Global Social Commerce OS with Escrow',
 }
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className="dark">
+    <html lang="en" className={`dark ${coiny.variable}`}>
       <body className="font-sans antialiased bg-black text-white">
         <div className="mx-auto max-w-md min-h-screen bg-black relative">
           {children}

@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, Boolean, Integer
+from sqlalchemy import Column, String, Boolean, Integer, DateTime
 from app.models.base import BaseModel
 
 class User(BaseModel):
@@ -7,6 +7,8 @@ class User(BaseModel):
     handle = Column(String, unique=True, index=True, nullable=True)
     display_name = Column(String, nullable=True)
     avatar_url = Column(String, nullable=True)
+    first_name = Column(String, nullable=True)
+    last_name = Column(String, nullable=True)
     
     email = Column(String, unique=True, index=True, nullable=True)
     hashed_password = Column(String, nullable=True)
@@ -14,6 +16,10 @@ class User(BaseModel):
     google_id = Column(String, unique=True, index=True, nullable=True)
     apple_id = Column(String, unique=True, index=True, nullable=True)
     
+    email_verified = Column(Boolean, default=False, nullable=False)
+    phone_verified = Column(Boolean, default=False, nullable=False)
+    phone_public = Column(Boolean, default=False, nullable=False)
+    last_login = Column(DateTime(timezone=True), nullable=True)
     is_seller = Column(Boolean, default=False, nullable=False)
     is_active = Column(Boolean, default=True, nullable=False)
     role = Column(String, default="user", nullable=False) # user, admin

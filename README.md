@@ -1,19 +1,8 @@
-# DROPP: Global Social Commerce OS with Escrow
+# Dropp - Global Social Commerce OS
 
-## 1. Executive Summary
-Dropp is a full-scale social commerce platform that turns unstructured social media DMs (Instagram, TikTok, WhatsApp) into secure, escrow-protected transactions. It combines an in-house video discovery feed (Dropp Reels), a 3-way negotiation chat (TradeChat), and a secure payment dashboard (Dropp Card).
+Dropp turns unstructured social media DMs into secure, escrow-protected transactions.
 
-## 2. The 3 Pillars of Dropp
-1. **Dropp Reels (Discovery):** A TikTok-style vertical video feed where sellers showcase items.
-2. **TradeChat (Negotiation):** A 3-way WebSocket chat (Buyer, Seller, Dropp AI Agent). The AI Agent verifies availability, determines dispatch mode, and locks in digital signatures before payment.
-3. **Dropp Card (Payments):** An append-only ledger dashboard showing Escrow (Pending), Available Balance, and DroppScore.
-
-## 3. Core Features
-- **The Secret Checkout:** Once both parties digitally sign the agreed terms, the AI Agent freezes the chat and sends a unique, time-limited checkout link to the Buyer.
-- **Dual Dispatch:** Sellers can either Self-Dispatch (upload own waybill) or use Dropp Dispatch (integrated via 3PL APIs like GIG/DHL, with Dropp taking a 5% logistics margin).
-- **Dropp Scout:** A premium AI feature ($5/mo Buyer, $20/mo Seller) that matches "Wanted Requests" with seller inventory across the Dropp network and external platforms.
-
-## 4. Architecture & Microservices
+## Current Architecture
 - `dropp-api`: FastAPI (REST, WebSockets, State Machine, Auth).
 - `dropp-worker`: Celery (Timers, Webhooks, Notifications).
 - `dropp-media`: Celery (FFmpeg video compression for Reels).
@@ -21,21 +10,14 @@ Dropp is a full-scale social commerce platform that turns unstructured social me
 - `dropp-db`: PostgreSQL 16.
 - `dropp-redis`: Redis 7 (Pub/Sub, Broker).
 
-## 5. The Escrow State Machine
-`draft` -> `sent` -> `viewed` -> `negotiating` -> `agreed` -> `awaiting_payment` -> `funded` -> `shipped` -> `delivered` -> `completed`. 
-Funds are only released when the state reaches `completed`.
+## System Status
+- **Foundation & Data Layer:** Complete.
+- **Reels Engine (Discovery):** Complete (HLS streaming, likes, comments, bookmarks).
+- **Auth Engine (Production):** Complete. Full email OTP (SMTP), phone OTP (Termii), Google SSO, and X-style UI.
+- **Creator Tab (Dashboard & Upload):** In Progress (Next Stage).
+- **TradeChat & Escrow:** Upcoming.
 
-## 6. Dispute Resolution & Auto-Release
-Dropp protects both parties with a 24-hour auto-release timer and a strict 72-hour dispute window. All evidence is uploaded via video/photo to the trade chat. If a dispute is opened, funds are frozen until an admin reviews the evidence and resolves the case (Refund Buyer or Release to Seller with penalties).
-
-## 7. Dropp Reels Engine
-Reels are powered by an HLS (HTTP Live Streaming) pipeline. The `dropp-media` worker uses FFmpeg to transcode uploads into an ABR (Adaptive Bitrate) ladder, chunked into 2-second HLS segments. This ensures seamless, buffer-free playback globally via CDN, even on 3G networks. The Reels backend includes full social features: Likes, Comments (threaded), Drops, and Shares.
-
-## 8. Dropp Scout (Pro Lead Gen)
-Dropp Scout is a premium SaaS feature for Pro Buyers. Users submit a "Wanted Request" (e.g., "Nike Air Jordan 1, Size 10, $300"). The Scout Engine uses external search APIs to find matching items on social media and public web indexes, scoring sellers by reputation and price. The buyer can then instantly send Dropp Bids to the top 5 sellers.
-
-## 9. The Notification Engine
-A centralized, multi-channel notification system (In-App via WebSockets, Email, SMS, and Push) powered by Celery workers. It ensures users are instantly alerted when a Scout match is found, funds are locked, an item is shipped, or a dispute is opened.
-
-## 10. The Reels Engine & Acquisition Loop
-Dropp uses a TikTok-style acquisition loop. The app opens directly into a public, animated Splash screen that routes to `/reels`. Viewers can watch videos instantly without signing up. Authentication is "lazy"—triggered only when a user tries to interact (like, comment, or create a Dropp bid). The feed uses a preloading client strategy and HLS adaptive bitrate streaming to ensure zero-buffer playback, powered by a caching layer for algorithmically ranked content.
+## Local Development
+1. Run `docker compose up -d --build`
+2. Frontend is available at `http://localhost:8080`
+3. API is available at `http://localhost:8000`

@@ -557,3 +557,31 @@ This document outlines how Dropp will handle millions of concurrent users.
 - **Issue:** Nginx defaults to a 1MB body size limit, causing `413 Request Entity Too Large` for video uploads.
 - **Fix:** Added `client_max_body_size 50M;` to the `http` block in `nginx.conf`.
 - **Production Note:** Once we move to Direct-to-Cloud uploads (S3/R2), Nginx will only handle JSON payloads (metadata) and this limit can be reduced back to `5M` for security.
+
+---
+
+## 42. AUTH ENGINE COMPLETE (PRODUCTION READY)
+
+### 42.1 Backend Architecture
+- **User Model Upgraded:** Added `first_name`, `last_name`, `email_verified`, `phone_verified`, `phone_public`, and `last_login`.
+- **OTP Service Created (`app/services/otp_service.py`):** 
+  - Email OTP uses SMTP (Google App Passwords). 
+  - Phone OTP uses Termii API (with a graceful terminal fallback if keys are missing).
+- **Auth Endpoints Secured:**
+  - `POST /signup/email` (Creates user, sends email OTP).
+  - `POST /signup/verify-email` (Verifies OTP, logs user in).
+  - `POST /login/email` (Validates email + password).
+  - `POST /login/phone/request` & `/verify` (Sends and validates SMS OTP).
+  - `POST /google` (Validates Google token, creates user if new).
+  - `POST /google/phone/request` & `/verify` (Forces Google users to add a phone).
+  - `POST /refresh` (Silent 15-minute access token refresh).
+
+### 42.2 Frontend Architecture (X-Style UI)
+- **Login Page:** Single "Phone, email, or username" input. System auto-detects if it is an email (routes to password) or a phone (routes to SMS OTP).
+- **Signup Page:** Two-step flow. Step 1: Name and Email. Step 2: Phone and Password (with Zod validation and error banners).
+- **UI Fixes:** Hidden the BottomNav on auth routes to prevent scrolling. Fixed Apple SVG icon. Added Google Modal "Skip for now" fallback.
+
+### 42.3 Prep for Creator Tab (Stage 7)
+- **Post Model Patched:** Added `attached_image_urls` (JSON) and `media_type` to support the Video + Photo Gallery feature.
+- **Delete Endpoint Added:** `DELETE /v1/posts/{post_id}` with strict ownership validation.
+
