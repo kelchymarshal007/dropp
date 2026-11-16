@@ -585,3 +585,83 @@ This document outlines how Dropp will handle millions of concurrent users.
 - **Post Model Patched:** Added `attached_image_urls` (JSON) and `media_type` to support the Video + Photo Gallery feature.
 - **Delete Endpoint Added:** `DELETE /v1/posts/{post_id}` with strict ownership validation.
 
+
+---
+
+## 43. CREATOR TAB & ACCOUNT MENU ARCHITECTURE (PHASE 7)
+
+### 43.1 Overview
+The Creator Tab is the command center for the user's business on Dropp. It encompasses the Profile UI, the Account Menu (dropdown), the Video Editor, and the Master Settings. 
+*Note: "My Trades" and "Wallet & Payouts" are excluded from Phase 7 and will be built alongside the Escrow Chat phase.*
+
+### 43.2 The Account Menu (Dropdown UI)
+Triggered by a settings/three-dots icon on the profile header. It will be a full-screen overlay or route.
+**Active Items to build now:**
+1. **My Profile:** Edit Avatar, Name, Bio, see public stats.
+2. **Saved Posts:** Grid of bookmarked Reels.
+3. **Liked Reels:** Grid of liked Reels.
+4. **Disputes & Evidence:** Upload proof for broken items.
+5. **Creator Analytics:** Views, watch time, engagement, Dropp Card conversions.
+6. **My Drafts:** Unpublished Reels saved by the editor.
+7. **My Reviews:** Feedback from completed trades (DroppScore).
+8. **Dropp Scout (Pro):** Manage Wanted Requests.
+9. **KYC & Verification:** Upload ID to unlock payouts.
+10. **Subscriptions:** Manage Dropp Pro.
+11. **Settings:** Master settings panel.
+12. **Help & Support:** FAQ, contact, report a bug.
+13. **Log Out:** Clear tokens, redirect to login.
+
+**Excluded for now (Escrow Phase):**
+- My Trades
+- Wallet & Payouts
+
+### 43.3 Master Settings (20+ Functions)
+The settings are broken down into categories for the UI:
+
+**A. Account & Security**
+1. Edit Profile (First/Last name, display name)
+2. Change Handle/Username
+3. Update Email & Phone (requires OTP)
+4. Change Password
+5. Two-Factor Authentication (2FA)
+
+**B. Privacy & Trust**
+6. Phone Number Visibility (`phone_public` toggle)
+7. Profile Visibility (Public vs Private)
+8. Who Can Message Me (Everyone / Verified / Following)
+9. Blocked & Muted Accounts
+10. Comment Filters (AI moderation)
+
+**C. Notifications**
+11. Push Notifications
+12. Email Notifications
+13. SMS Alerts
+14. In-App Alerts (Likes, comments, follows)
+
+**D. Payments & Commerce**
+15. Manage Bank Accounts (Add/Remove default)
+16. Payout Schedule (Instant / Daily / Weekly)
+17. Default Currency (NGN, USD, etc.)
+
+**E. Creator Preferences**
+18. Auto-Save Drafts (Toggle)
+19. Download Your Data (GDPR compliance)
+20. Default Reel Privacy (Public vs Followers)
+
+**F. App Preferences & Accessibility**
+21. Data Saver Mode (Lower video resolution)
+22. Language Selection
+23. Clear Cache
+24. Linked Accounts (Google/Apple)
+
+**G. Legal & Support**
+25. Terms of Service & Privacy Policy
+26. Help Center
+27. Log Out
+
+### 43.4 UI/UX Directives for Profile Page
+- Adjust layout to mimic TikTok's 3-column masonry grid.
+- Maintain Dropp theme: `#000000` background, `#FF9900` (Amazon Orange) for primary CTAs/accents.
+- Integrate the three-dots icon into the profile header to trigger the Account Menu.
+- Modals must use the X-style rounded UI (`rounded-2xl`).
+
