@@ -85,7 +85,7 @@ export default function ProfilePage() {
             <div className="col-span-3 text-center py-12 text-gray-500">No reels yet. Tap + to upload!</div>
           ) : (
             reels.map((reel) => (
-              <Link href={`/reels?start=${reel.id}`} key={reel.id} className="relative aspect-[9/16] bg-surface block">
+              <Link href={`/reels?user=${user.id}&start=${reel.id}`} key={reel.id} className="relative aspect-[9/16] bg-surface block">
                 {reel.media_type === 'video' ? (
                   <video src={reel.media_urls?.[0]} className="w-full h-full object-cover opacity-80" muted playsInline />
                 ) : (

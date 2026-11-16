@@ -73,3 +73,51 @@ async def refresh_token(request: Request, response: Response, db: AsyncSession =
         
     new_access = create_access_token({"sub": str(user.id)})
     return {"access_token": new_access, "user_id": str(user.id), "is_seller": user.is_seller}
+
+
+# === GOOGLE SSO ===
+import requests
+from pydantic import BaseModel
+
+class GoogleAuthPayload(BaseModel):
+    credential: str
+
+@router.post("/google", response_model=TokenResponse)
+async def google_auth(payload: GoogleAuthPayload, response: Response, db: AsyncSession = Depends(get_db)):
+    try:
+        google_res = requests.get(
+            f"https://oauth2.googleapis.com/tokeninfo?id_token={payload.credential}",
+            timeout=10
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Google verification failed: {e}")
+    
+    if google_res.status_code != 200:
+        raise HTTPException(status_code=400, detail="Invalid Google token")
+    
+    google_data = google_res.json()
+    email = google_data.get("email")
+    google_id = google_data.get("sub")
+    name = google_data.get("name")
+    picture = google_data.get("picture")
+    
+    if not email:
+        raise HTTPException(status_code=400, detail="Google account has no email")
+    
+    result = await db.execute(select(User).where(User.email == email))
+    user = result.scalar_one_or_none()
+    
+    if not user:
+        user = User(
+            email=email,
+            google_id=google_id,
+            display_name=name,
+            avatar_url=picture
+        )
+        db.add(user)
+        await db.commit()
+        await db.refresh(user)
+    
+    set_refresh_cookie(response, str(user.id))
+    token = create_access_token({"sub": str(user.id)})
+    return {"access_token": token, "user_id": str(user.id), "is_seller": user.is_seller}

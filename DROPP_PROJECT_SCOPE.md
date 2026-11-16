@@ -478,3 +478,49 @@ To ensure the server never slows down, we use an asynchronous pipeline:
 - Backend: Endpoint to trigger SMS OTP via Termii.
 - Frontend: Phone input form -> Send OTP -> 6-digit verification screen -> Issue Tokens.
 - Purpose: Market fit for Africa where phone numbers are more reliable than emails.
+
+---
+
+## 39. DAY 2 COMPLETION: GOOGLE SSO & PRODUCTION AUTH
+
+### 39.1 What We Have Completed
+- **Email Auth:** Strict client-side validation (Zod), dynamic password strength meter, and backend enforcement (Pydantic).
+- **Google SSO:** Full backend verification using Google's tokeninfo API. Frontend uses `@react-oauth/google` with a black pill button.
+- **Security:** Short-lived access tokens (15 mins) + HttpOnly, Secure, SameSite refresh tokens (30 days).
+- **Session Management:** Full logout flow that clears local storage and redirects to `/login`.
+- **Infrastructure:** Nginx dynamic DNS resolution prevents 502 errors on container rebuilds. Media is cached for 30 days.
+
+### 39.2 What is Left (Roadmap)
+- **Phone OTP:** Termii integration for the African market.
+- **Creator Editor:** Video trim, text, and royalty-free music.
+- **TradeChat & Escrow:** The AI Notary, digital signatures, and secret checkout.
+- **BIKEM Pay Engine:** Wiring the actual payment gateway.
+
+### 39.3 What's Next (Immediate)
+- Complete Phone OTP (Termii) to finish the Auth blueprint.
+
+---
+
+## 40. PRODUCTION README: GOOGLE OAUTH CONFIGURATION
+
+**CRITICAL:** Before launching to production, you must update your Google Cloud Console settings. Google will block authentication if the domain doesn't match.
+
+### 40.1 Current Dev Configuration
+Right now, the app is authorized for:
+- `http://localhost:8080` (Local Nginx Proxy)
+- `https://random-words.trycloudflare.com` (Temporary Tunnel)
+
+### 40.2 Production Configuration Steps
+When you buy a domain (e.g., `dropp.app`) and deploy to a server:
+1. Go to [Google Cloud Console](https://console.cloud.google.com/).
+2. Navigate to **APIs & Services -> Credentials**.
+3. Click your OAuth 2.0 Client ID.
+4. Under **Authorized JavaScript origins**, add:
+   - `https://dropp.app`
+   - `https://www.dropp.app` (if applicable)
+5. Under **Authorized redirect URIs**, add:
+   - `https://dropp.app`
+6. **Clean up:** Remove `localhost:8080` and the `trycloudflare.com` URL so unauthorized domains cannot use your Client ID.
+7. Click **Save**.
+
+*Note: The Client ID inside `dropp-web/src/components/AuthProvider.tsx` remains the same. You only change the allowed domains in the Google Console.*

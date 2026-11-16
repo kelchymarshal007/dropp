@@ -56,7 +56,7 @@ export default function PublicProfilePage() {
       <div className="border-t border-border mt-2">
         <div className="grid grid-cols-3 gap-[2px]">
           {data.posts.map((reel: any) => (
-            <Link href={`/reels?start=${reel.id}`} key={reel.id} className="relative aspect-[9/16] bg-surface block">
+            <Link href={`/reels?user=${data.id}&start=${reel.id}`} key={reel.id} className="relative aspect-[9/16] bg-surface block">
               {reel.media_type === 'video' ? (
                 <video src={reel.media_urls[0]} className="w-full h-full object-cover opacity-80" muted playsInline />
               ) : (
