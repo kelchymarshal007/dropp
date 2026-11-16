@@ -446,3 +446,23 @@ To ensure the server never slows down, we use an asynchronous pipeline:
 3. **Media Worker:** A dedicated Celery container (running FFmpeg) picks up the task, transcodes the video to 720p/1080p H.264, and generates HLS chunks.
 4. **CDN Delivery:** The processed chunks are uploaded to Cloudflare R2 and served via CDN. The database is updated with the new `.m3u8` URL.
 5. **Scalability:** Because processing happens in the background, the API can accept 10,000 uploads per second without breaking a sweat.
+
+## 37. SCOPED FEED ARCHITECTURE (Profile-Initiated Reels)
+
+### 37.1 UX Rule
+- Global Reels (`/reels`): All active reels from all users, paginated.
+- Scoped Feed (`/reels?user={user_id}&start={reel_id}`): Only reels by that user.
+- Escape: Tapping the Reels tab in bottom nav always navigates to `/reels` (global).
+
+### 37.2 Backend Endpoints
+- `GET /v1/feed/` - Global feed (all active posts)
+- `GET /v1/feed/user/{user_id}` - Scoped feed (only that user's active posts)
+- Both share the same enrichment logic (likes, follows, bookmarks).
+
+### 37.3 Frontend Behavior
+- Profile thumbnails link to `/reels?user={id}&start={reel_id}`.
+- The Reels page reads the `user` param on mount. If present, fetches `/feed/user/{id}` instead of `/feed/`.
+- A subtle pill at the top shows "@username" when scoped, with an X to return to `/reels` (global).
+- The bottom nav Reels tab always resets scope.
+- Deep linking math-scroll works identically in both modes.
+- Pagination is per-scope (user's feed paginates within that user's content).
