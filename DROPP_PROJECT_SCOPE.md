@@ -552,3 +552,8 @@ This document outlines how Dropp will handle millions of concurrent users.
 ### 41.6 Background Processing (Celery Queues)
 - **Problem:** Worker bottlenecks.
 - **Solution:** Dedicated queues (media, email, sms, timers) with auto-scaling container groups.
+
+### 41.7 Nginx Upload Limits
+- **Issue:** Nginx defaults to a 1MB body size limit, causing `413 Request Entity Too Large` for video uploads.
+- **Fix:** Added `client_max_body_size 50M;` to the `http` block in `nginx.conf`.
+- **Production Note:** Once we move to Direct-to-Cloud uploads (S3/R2), Nginx will only handle JSON payloads (metadata) and this limit can be reduced back to `5M` for security.
