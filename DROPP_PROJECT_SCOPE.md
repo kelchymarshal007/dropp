@@ -745,3 +745,69 @@ The settings are broken down into categories for the UI:
 - Integrate the three-dots icon into the profile header to trigger the Account Menu.
 - Modals must use the X-style rounded UI (`rounded-2xl`).
 
+
+---
+
+## 44. CREATOR TAB: EDIT PROFILE ARCHITECTURE (PHASE 7B)
+
+### 44.1 Database Updates (User Model)
+To support a TikTok/X-style profile, the `users` table needs:
+- `bio` (String): 160-char description.
+- `banner_url` (String): Cover photo.
+- `business_name` (String): Public business name.
+- `business_category` (String): e.g., Fashion, Electronics.
+- `location` (String): City/Country.
+
+### 44.2 API Endpoints
+- `GET /v1/users/me`: Returns full profile (display_name, bio, banner_url, etc.).
+- `PUT /v1/users/me`: Updates profile fields. Requires rate-limiting.
+- `GET /v1/users/check-handle/{handle}`: Real-time debounced check for handle availability.
+- `POST /v1/users/me/upload-url`: Generates Presigned URL for direct-to-R2 avatar/banner uploads.
+
+### 44.3 Scalability Decisions
+1. **Handle Changes:** Database `UNIQUE` constraint + debounced frontend checks prevent collisions at scale.
+2. **Image Uploads:** Presigned URLs bypass FastAPI, preventing server crashes under heavy concurrent image uploads.
+3. **Optimistic UI:** Frontend updates instantly on save. If the API fails, it rolls back and shows an error toast.
+
+### 44.4 UI/UX Directives
+- Profile Header: Banner, Avatar, Name, Handle, Bio, Edit Button.
+- Edit Page: X-style full screen, camera icon overlays, form inputs with `focus:border-dropp-orange`.
+
+
+---
+
+## 45. CREATOR TAB DROPDOWN: EXECUTION STRATEGY (REVISED)
+
+To maintain order and production-grade quality, the Creator Tab dropdown items will be built sequentially in the following order. Features outside this immediate scope are deferred to their respective architectural phases.
+
+### 45.1 Phase 1: Completed Core Profile
+- [x] **Edit Profile:** Fully built (banner, avatar, structured address, handle check).
+- [x] **Saved Posts:** Fully built (Bookmarks Modal + Infinite Scoped Feed).
+
+### 45.2 Phase 2: Content Management (Current Focus)
+- [ ] **Liked Reels:** Grid of all Reels liked by the user. Clicking a reel opens the scoped feed.
+- [ ] **My Drafts:** Unpublished reels saved via the video editor.
+
+### 45.3 Phase 3: Master Settings Page
+- [ ] **Settings (`/profile/settings`):** Building the 24-point architecture.
+  - *Account & Security:* Change password, 2FA, update email/phone.
+  - *Privacy & Trust:* Toggle `phone_public`, set profile to private, message filters.
+  - *Notifications:* Push, Email, SMS toggles.
+  - *Payments:* Manage bank accounts, payout schedule.
+  - *App Preferences:* Data saver mode, language.
+
+### 45.4 Phase 4: Video Editor & Upload Flow (Deferred)
+- [ ] **Creator Analytics:** Stats on views, engagement, and conversions (built alongside upload flow).
+- [ ] **Full Upload Tool:** `ffmpeg.wasm` integration for trim, crop, and text overlays.
+- [ ] **Spotify Integration:** Add music to reels, displaying the track just like Spotify does.
+- [ ] **Reels + Image Gallery:** Allow users to upload images alongside a video. A glowing thumbnail will appear on the right side of the Reel; clicking it opens the pre-built image carousel modal.
+
+### 45.5 Phase 5: Chat, Escrow & Inbox Tab (Deferred)
+- [ ] **WhatsApp-Style Chat:** The UI for TradeChat and Escrow negotiation will follow a WhatsApp-style interface.
+- [ ] **Escrow Integrations:** The remaining dropdown items will be integrated here:
+  - *Disputes & Evidence:* Evidence locker for trade disputes.
+  - *Dropp Scout (Pro):* Wanted requests and lead gen.
+  - *My Reviews:* Feedback and DroppScore.
+  - *KYC & Verification:* ID uploads for payouts.
+  - *Subscriptions:* Pro tier management.
+

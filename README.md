@@ -14,7 +14,7 @@ Dropp turns unstructured social media DMs into secure, escrow-protected transact
 - **Foundation & Data Layer:** Complete.
 - **Reels Engine (Discovery):** Complete (HLS streaming, likes, comments, bookmarks).
 - **Auth Engine (Production):** Complete. Full email OTP (SMTP), phone OTP (Termii), Google SSO, and X-style UI.
-- **Creator Tab (Dashboard, Account Menu, Settings):** Architecture defined. UI build pending.
+- **Creator Tab (Dashboard, Account Menu, Settings):** Phase 1 (Edit Profile, Saved Posts) complete. Building Liked Reels and My Drafts next.
 - **TradeChat & Escrow:** Upcoming.
 
 ## Local Development
